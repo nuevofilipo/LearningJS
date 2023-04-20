@@ -1,0 +1,2 @@
+# LearningJS
+Learning JavaScript
