@@ -31,8 +31,9 @@ interface ERC20Token {
 contract GameContract{
 
 // Declaring certain things
-mapping(address => bool) public callers;
+mapping(address => bool) public depositors;
 ERC20Token public BUSD;
+address public Creator = 0x035dCD3b056BdDbf82273A1b93c7B8cd25614995;
 
 constructor() public {
     //The tokens addresses are assigned to some names
@@ -40,15 +41,23 @@ constructor() public {
     }
 
 
-// Function to add a caller to the mapping
-function addCaller() public {
-    callers[msg.sender] = true;
+function deposit(uint256 _amount, uint256 _feePercentage) public{
+    uint256 busdBalance = BUSD.balanceOf(address(msg.sender));
+    require(_amount > 0, "You need to deposit more than 0");
+    require(busdBalance >= _amount, "You don't have enough BUSD");
+
+
+    BUSD.transferFrom(msg.sender, address(this), (_amount * (1 - (_feePercentage/100)))); // be careful, as you still will have to add the decimal zeros to the amount
+    BUSD.transferFrom(msg.sender, Creator, (_amount * (_feePercentage/100))  ); // 10% of the amount goes to creator of contract))
+    depositors[msg.sender] = true;
 }
 
-// Function to check if an address exists in the mapping and delete it
-function deleteCaller(address _caller) public {
-    if (callers[_caller]) {
-        delete callers[_caller];
-    }
+
+function withdraw(uint256 _amount) public{
+    require(depositors[msg.sender], "You are not a depositor");
+    require(_amount > 0, "You need to withdraw more than 0");
+    BUSD.transfer(msg.sender, _amount); // amount still needs to be given with the decimal zeros
+    delete depositors[msg.sender];
 }
+
 }
