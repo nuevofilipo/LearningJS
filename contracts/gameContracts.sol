@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity >=0.6.0 <0.8.7;
 
 
 interface ERC20Token {
@@ -32,13 +32,33 @@ contract GameContract{
 
 // Declaring certain things
 mapping(address => bool) public depositors;
-ERC20Token public BUSD;
-address public Creator = 0x035dCD3b056BdDbf82273A1b93c7B8cd25614995;
+mapping(address => uint256) public amountWon;
 
-constructor() public {
-    //The tokens addresses are assigned to some names
-    BUSD = ERC20Token(0xbCe98d116cA02A87a2E6c8EDf9597CEd50f3B0a2);
-    }
+ERC20Token public BUSD = ERC20Token(0xbCe98d116cA02A87a2E6c8EDf9597CEd50f3B0a2);
+address public Creator = 0x035dCD3b056BdDbf82273A1b93c7B8cd25614995;
+bool public      rescueActive = false;
+
+
+modifier onlyOwner() {
+    require(msg.sender == Creator, "You are not  the creator of this contract");
+    _;
+}
+
+function assignBUSDAddress(address _address) public onlyOwner {
+    BUSD = ERC20Token(_address);
+}
+
+function activateRescue() public onlyOwner {
+    rescueActive = true;
+}
+
+function deactivateRescue() public onlyOwner {
+    rescueActive = false;
+}
+
+function increaseAmountWon(address _address, uint256 _amount) public onlyOwner {
+    amountWon[_address] += _amount;
+}
 
 
 function deposit(uint256 _amount, uint256 _feePercentage) public{
@@ -53,11 +73,22 @@ function deposit(uint256 _amount, uint256 _feePercentage) public{
 }
 
 
-function withdraw(uint256 _amount) public{
-    require(depositors[msg.sender], "You are not a depositor");
-    require(_amount > 0, "You need to withdraw more than 0");
+function withdraw() public{
+    require(depositors[msg.sender]  == true , "You are not a depositor");
+    require(amountWon[msg.sender] > 0 , "You have not won anything at all");
+    uint256 _amount = amountWon[msg.sender];
     BUSD.transfer(msg.sender, _amount); // amount still needs to be given with the decimal zeros
+    delete depositors[msg.sender];
+    amountWon[msg.sender] -= _amount;
+}
+
+function rescue(uint256 _amount) public {
+    require(rescueActive == true, "Rescue is not active");
+    require(depositors[msg.sender] == true, "You are not a depositor");
+    BUSD.transfer(msg.sender, _amount);
     delete depositors[msg.sender];
 }
 
 }
+
+

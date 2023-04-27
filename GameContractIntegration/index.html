@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameContract Connection</title>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"
+    ></script>
+    <style>
+      body {
+        background-color: palevioletred;
+        font-size: 33px;
+        text-align: center;
+      }
+      button {
+        background-color: aquamarine;
+        font-size: 33px;
+        font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+        margin-top: 30px;
+      }
+      button:hover {
+        background-color: yellow;
+      }
+      .input {
+        width: 200px;
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="approval" , onclick="approveBUSD()">
+      Approve BUSD Spending
+    </button>
+    <br />
+    <input class="input" , id="spender" /> <br />
+    <input class="input" , id="amount" , type="number" /> <br />
+    <button id="connectMeta" , onclick="connectMetamask()">
+      Connect Metamask
+    </button>
+    <br />
+    <button id="connectContract" , onclick="connectContract()">
+      Connect contract
+    </button>
+    <br />
+    <p id="contractArea"></p>
+    <button id="showBalance" , onclick="readContract()">
+      show my balance of tBUSD
+    </button>
+    <br />
+    <p id="balanceArea"></p>
+
+    <script src="./gameContract.js"></script>
+  </body>
+</html>
